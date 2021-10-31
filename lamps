@@ -1,0 +1,177 @@
+#!/bin/bash
+
+# Author : Arunkumar
+# Date created : 12/10/2021
+# Date Modified : 22/10/2021
+
+# Description :
+# This bash script will help us to install,start,stop and monitor LAMP stack's services 
+uopt=$1
+arb=$(which apt-get)
+: 'if [ -z "$arb" ];
+then echo "Debian"
+else
+ echo "Red Hat"
+fi  '
+notInstalled()
+{
+   echo ""
+   echo "*** LAMP stack not found***"
+   echo ""
+   read -p "Install LAMP Stack? " opt
+   case $opt in 
+   	y|Y|yes|Yes)
+
+   	echo "Installation of LAMP initiated..."
+   	echo ""
+	installamp
+	exit
+   	;;
+   	
+   	n|no|No|N)
+   	echo "	Install LAMP to use services"
+   	;;
+   	
+   	*)
+   	echo "Enter the Valid options"
+   	echo "		y 'to install LAMP'"
+   	echo "		n 'to quit'"
+   	;;
+   esac
+   
+}
+
+installamp()
+{	if [ -z "$arb" ];#if arb is null if block will execute
+	then 
+	echo "Red hat Implementation for installing services"
+	sudo yum install httpd
+	sudo systemctl start httpd.service
+	sudo systemctl enable httpd.service
+	sudo yum install mariadb-server mariadb
+	sudo systemctl start mariadb
+	sudo mysql_secure_installation
+	sudo systemctl enable mariadb.service
+	sudo yum install php php-mysql
+	sudo systemctl restart httpd.service
+	else
+	sudo apt-get update -y && sudo apt-get upgrade -y
+	echo "Installing in Debian"
+	sudo apt-get install apache2
+	sudo apt-get install mysql-server
+	sudo apt-get install php libapache2-mod-php php-mysql
+	sudo systemctl restart apache2
+	fi
+}
+startwebdbserve()
+{	if [ -z "$arb" ];# if arb is null if block will execute
+	then 
+	echo "Red hat Implementation for starting services"
+	sudo systemctl start httpd.service
+	sudo systemctl start mariadb
+	sudo mysql_secure_installation          
+	sudo systemctl restart httpd.service    
+	else                                    
+	sudo apt-get install  xdg-utils -y      
+	sudo systemctl start apache2 || notInstalled          
+	sudo service mysql start || notInstalled
+	sudo mysql -u $MYSQLUSER --password=$MYSQLPASSWORD < "$PWD/dbinit.sql"
+	# if [ -d /var/www/html/linux-assignment-1 ]; then
+         #       sudo rm -rf /var/www/html/linux-assignment-1
+        #fi
+        sudo apt install git -y
+	sudo git clone https://arunkumar483@bitbucket.org/arunkumar483/linux-assignment-1.git /var/www/html/linux-assignment-1
+	xdg-open http://localhost/linux-assignment-1/src/index.php
+	fi
+}
+stopwebdbserve()
+{    if [ -z "$arb" ];# if arb is null if block will execute
+	then 
+	echo "Red hat Implementation for stopping services "
+	systemctl stop httpd.service
+	systemctl stop mariadb
+	systemctl stop mysql
+     else
+     echo "stopping Apache server"
+     sudo service apache2 stop || notInstalled
+     echo "stopping Mysql server"
+     sudo service mysql stop || notInstalled
+     fi
+
+
+}
+checkstatusservices()
+{    if [ -z "$arb" ];#if arb is null if block will execute
+	then 
+	echo "Red hat Implementation for checking status "
+        service httpd status
+        service mysql status
+     else
+     sudo service apache2 status || notInstalled
+     sudo service mysql status || notInstalled
+     fi
+}
+
+opendbconsole()
+{
+	sudo mysql -u root -p 2> ~/ERROR
+	error=$(cat ~/ERROR)
+	sudo rm ~/ERROR
+	STR="Can't connect to local MySQL server"
+	if [[ "$error" == *"$STR"* ]]; then
+	  echo "starting db and web server"
+	  startwebdbserve
+	  echo "Starting mysql console..."
+	  sudo mysql -u root -p
+	fi
+}
+
+displayOptions()
+{
+	echo "		--install 'install LAMP STACK'"
+	echo "		--start 'start services'" 	
+	echo "		--stop 'stop running services'"  
+	echo "		--checkstatus 'check status of services'" 
+	echo "		--mysql 'open MySQL console'" 
+	echo "		--version 'list version of db server, app server and php'" 
+}
+
+checkVersion()
+{
+	echo "*DB server:"
+	   mysql -V
+	echo "*web server:"
+	   apache2 -v
+	echo "*php:"
+	   php -v
+}
+
+case $uopt in
+--install)
+	echo "Installing lamp stack"
+	installamp
+	;;
+--start)
+	echo "Starting lamp web and db server"
+	startwebdbserve
+	;;
+--stop)
+	echo "Stopping lamp web and db server"
+	stopwebdbserve
+	;;
+--checkstatus)
+	echo "Checking status of services"
+	checkstatusservices
+	;;
+--mysql)
+	echo "Starting mysql..."
+	opendbconsole
+	;;
+--version)
+	checkVersion
+	;;
+*)	
+	echo "give valid options"
+	displayOptions
+	;;
+esac

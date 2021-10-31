@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Author : Arunkumar
+# Date created : 12/10/2021
+# Date Modified : 22/10/2021
+
+# Description :
+# This bash script will help us to backup sql database
+
+if [ ! -d /opt/backups ]; then
+	sudo -S mkdir /opt/backups 2>> error.txt
+fi
+bfilename="DB-backup-$(date '+%d-%m-%Y')"
+cd ~/mybashes/
+
+sudo mysqldump -u $MYSQLUSER -p$MYSQLPASS "crud_db" > "$bfilename" --no-tablespaces
+echo $bfilename
+sudo mv ~/mybashes/$bfilename /opt/backups/
