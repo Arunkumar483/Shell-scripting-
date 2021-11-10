@@ -14,16 +14,16 @@ fi
 backupfilename="DB-backup-$(date '+%d-%m-%Y')"
 
 
-sudo -S mysqldump -u "$MYSQLUSER" -p"$MYSQLPASS" "crud_db" > "$backupfilename" --no-tablespaces 2>>error.txt
+sudo -S mysqldump -u "$MYSQLUSER" -p"$MYSQLPASS" "crud_db" > "$backupfilename" --no-tablespaces 2>> ~/Desktop/errors.txt
 cd ~/mybashes/
 echo $PWD
 if [ ! -f /opt/backups/sqlbackup.tar ]; then
 	echo "Archive File Creation...." >> ~/Desktop/logs.txt
-	sudo -S tar cvf "/opt/backups/sqlbackup.tar" -C "$PWD" "$backupfilename" 
+	sudo -S tar cvf "/opt/backups/sqlbackup.tar" -C "$PWD" "$backupfilename" 2>> ~/Desktop/errors.txt
 else
 	echo "Archive File Updation" >> ~/Desktop/logs.txt
-	sudo -S tar rvf "/opt/backups/sqlbackup.tar" -C "$PWD" "$backupfilename"
+	sudo -S tar rvf "/opt/backups/sqlbackup.tar" -C "$PWD" "$backupfilename" 2>> ~/Desktop/errors.txt
 fi
-sudo rm "$PWD/$backupfilename" 2>>error.txt
-echo "Tar archive backup done in opt/backup "
+sudo rm "$PWD/$backupfilename" 2>> ~/Desktop/errors.txt
+echo "Tar archive backup done in opt/backup " >> ~/Desktop/logs.txt
 
