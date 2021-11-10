@@ -7,12 +7,21 @@
 # Description :
 # This bash script will help us to backup sql database
 
+cd ~/mybashes
 if [ ! -d /opt/backups ]; then
-	sudo -S mkdir /opt/backups 2>> error.txt
+	sudo -S mkdir /opt/backups
 fi
-bfilename="DB-backup-$(date '+%d-%m-%Y')"
-cd ~/mybashes/
+backupfilename="DB-backup-$(date '+%d-%m-%Y')"
 
-sudo mysqldump -u $MYSQLUSER -p$MYSQLPASS "crud_db" > "$bfilename" --no-tablespaces
-echo $bfilename
-sudo mv ~/mybashes/$bfilename /opt/backups/
+
+sudo -S mysqldump -u "$MYSQLUSER" -p"$MYSQLPASS" "crud_db" > "$backupfilename" --no-tablespaces 2>>error.txt
+cd ~/mybashes/
+echo $PWD
+if [ ! -f /opt/backups/sqlbackup.tar ]; then
+	echo "Archive File Creation...." >> ~/Desktop/logs.txt
+	sudo -S tar cvf "/opt/backups/sqlbackup.tar" -C "$PWD" "$backupfilename" 
+else
+	echo "Archive File Updation" >> ~/Desktop/logs.txt
+	sudo -S tar rvf "/opt/backups/sqlbackup.tar" -C "$PWD" "$backupfilename"
+fi
+
