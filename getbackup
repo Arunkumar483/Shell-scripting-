@@ -6,7 +6,7 @@
 
 # Description :
 # This bash script will help us to backup sql database
-
+echo "$userpass" |sudo -S service mysql start
 cd ~/mybashes
 if [ ! -d /opt/backups ]; then
 	sudo -S mkdir /opt/backups
@@ -24,4 +24,6 @@ else
 	echo "Archive File Updation" >> ~/Desktop/logs.txt
 	sudo -S tar rvf "/opt/backups/sqlbackup.tar" -C "$PWD" "$backupfilename"
 fi
+sudo rm "$PWD/$backupfilename" 2>>error.txt
+echo "Tar archive backup done in opt/backup "
 
