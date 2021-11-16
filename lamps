@@ -75,10 +75,12 @@ startwebdbserve()
 	sudo apt-get install  xdg-utils -y      
 	sudo systemctl start apache2 || notInstalled          
 	sudo service mysql start || notInstalled
-	sudo mysql -u $MYSQLUSER --password=$MYSQLPASSWORD < "$PWD/dbinit.sql"
-	# if [ -d /var/www/html/linux-assignment-1 ]; then
-         #       sudo rm -rf /var/www/html/linux-assignment-1
-        #fi
+	
+	sudo mysql -u root -p$MYSQLPASS < "$PWD/dbinit.sql"
+	if [ -d /var/www/html/linux-assignment-1 ]; then
+		echo "deleting outdated project directory"
+               sudo rm -rf /var/www/html/linux-assignment-1 
+        fi
         sudo apt install git -y
 	sudo git clone https://arunkumar483@bitbucket.org/arunkumar483/linux-assignment-1.git /var/www/html/linux-assignment-1
 	xdg-open http://localhost/linux-assignment-1/src/index.php

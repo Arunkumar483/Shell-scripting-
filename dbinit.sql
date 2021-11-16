@@ -1,5 +1,5 @@
 /* Create Database and Table */
-create IF NOT EXISTS database crud_db;
+create database IF NOT EXISTS  crud_db;
 
 use crud_db;
 
