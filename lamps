@@ -7,12 +7,9 @@
 # Description :
 # This bash script will help us to install,start,stop and monitor LAMP stack's services 
 uopt=$1
+#apt-get will only be available in Debian
 arb=$(which apt-get)
-: 'if [ -z "$arb" ];
-then echo "Debian"
-else
- echo "Red Hat"
-fi  '
+
 notInstalled()
 {
    echo ""
@@ -42,7 +39,7 @@ notInstalled()
 }
 
 installamp()
-{	if [ -z "$arb" ];#if arb is null if block will execute
+{	if [ -z "$arb" ]; #if the distribution is red hat based then $arb string will be null so if block will execute
 	then 
 	echo "Red hat Implementation for installing services"
 	sudo yum install httpd
@@ -54,7 +51,7 @@ installamp()
 	sudo systemctl enable mariadb.service
 	sudo yum install php php-mysql
 	sudo systemctl restart httpd.service
-	else
+	else #If (apt-get) $arb string  exists then else block will execute
 	sudo apt-get update -y && sudo apt-get upgrade -y
 	echo "Installing in Debian"
 	sudo apt-get install apache2
@@ -64,18 +61,18 @@ installamp()
 	fi
 }
 startwebdbserve()
-{	if [ -z "$arb" ];# if arb is null if block will execute
+{	if [ -z "$arb" ]; #if the distribution is red hat based then $arb string will be null so if block will execute
 	then 
 	echo "Red hat Implementation for starting services"
 	sudo systemctl start httpd.service
 	sudo systemctl start mariadb
 	sudo mysql_secure_installation          
 	sudo systemctl restart httpd.service    
-	else                                    
+	else  #If (apt-get) $arb string  exists then else block will execute                                 
 	sudo apt-get install  xdg-utils -y      
 	sudo systemctl start apache2 || notInstalled          
 	sudo service mysql start || notInstalled
-	
+	#Initialize db for first time implementation
 	sudo mysql -u root -p$MYSQLPASS < "$PWD/dbinit.sql"
 	if [ -d /var/www/html/linux-assignment-1 ]; then
 		echo "deleting outdated project directory"
@@ -87,13 +84,13 @@ startwebdbserve()
 	fi
 }
 stopwebdbserve()
-{    if [ -z "$arb" ];# if arb is null if block will execute
+{    if [ -z "$arb" ]; #if the distribution is red hat based then $arb string will be null so if block will execute
 	then 
 	echo "Red hat Implementation for stopping services "
 	systemctl stop httpd.service
 	systemctl stop mariadb
 	systemctl stop mysql
-     else
+     else #If (apt-get) $arb string  exists then else block will execute
      echo "stopping Apache server"
      sudo service apache2 stop || notInstalled
      echo "stopping Mysql server"
@@ -103,12 +100,12 @@ stopwebdbserve()
 
 }
 checkstatusservices()
-{    if [ -z "$arb" ];#if arb is null if block will execute
+{    if [ -z "$arb" ]; #if the distribution is red hat based then $arb string will be null so if block will execute
 	then 
 	echo "Red hat Implementation for checking status "
         service httpd status
         service mysql status
-     else
+     else #If (apt-get) $arb string  exists then else block will execute
      sudo service apache2 status || notInstalled
      sudo service mysql status || notInstalled
      fi
