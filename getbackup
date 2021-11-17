@@ -6,14 +6,12 @@
 
 # Description :
 # This bash script will help us to backup sql database
-echo "$userpass" |sudo -S service mysql start
+echo "$MYSQLPASS" |sudo -S service mysql start
 cd ~/mybashes
 if [ ! -d /opt/backups ]; then
 	sudo -S mkdir /opt/backups
 fi
 backupfilename="DB-backup-$(date '+%d-%m-%Y')"
-
-
 sudo -S mysqldump -u "$MYSQLUSER" -p"$MYSQLPASS" "crud_db" > "$backupfilename" --no-tablespaces 2>> ~/Desktop/errors.txt
 cd ~/mybashes/
 echo $PWD
